@@ -10,32 +10,44 @@ function battleShip(size) {
     }
     console.log("<----- Battlefield game ----->\nRules: You have an area " + size + "*" + size + "\nYou have only one chance to find the ship!\nThe game starting.\n");
     fieldOutput(matr);
-    let rl = require('readline');
-    let prompts = rl.createInterface(process.stdin, process.stdout);
-    prompts.question("Input x: ", function (x) {
-        prompts.question("Input y: ", function (y) {
-            let a = battleFieldChange(x, y, size, rowIndex, colIndex, matr);
-            fieldOutput(matr);
-            if (a){
-                console.log("Unfortunately you don`t kill the ship. Please, start a new game.")
-            }
-            else{
-                console.log("Congratulations! You killed it!");
-            }
-            prompts.close();
-        });
-    });
-}
 
-function battleFieldChange(x, y, size, rowIndex, colIndex, matr){
-    if((rowIndex == x) && (colIndex == y)){
-        matr[x][y] = "#";
-       return false;
-    }
-    else{
-        matr[x][y] = "+";
-        return true;
-    }
+    let rl = require('readline');
+    let i = 0;
+    let vars = [];
+    let prompts = rl.createInterface(process.stdin, process.stdout);
+    prompts.on('line', function (data) {
+
+        vars[i] = data.toString().trim();
+        i++;
+        if(i > 1){
+            if (checkCoordinates(vars[0], rowIndex, vars[1], colIndex, size)){
+                console.log("Congratulations! You killed it!");
+                prompts.close();
+            } else {
+                i = 0;
+            }
+        }
+    }).on('close', function () {
+        process.exit(0);
+    });
+
+    function checkCoordinates(x, x1, y, y1, size) {
+        if ((Number(x) > size) || (Number(y) > size) || (Number(x) <= 0) || (Number(y) <= 0)) {
+            console.log("Wrong input data!");
+            return false;
+        }
+        else{
+            if (Number(x) === x1 && Number(y) === y1) {
+                matr[x - 1][y - 1] = "#";
+                fieldOutput(matr);
+                return true;
+            } else {
+                matr[x - 1][y - 1] = "+";
+                fieldOutput(matr);
+                return false;
+            }
+        }
+    };
 }
 
 function fieldOutput(matr){
@@ -49,4 +61,4 @@ function fieldOutput(matr){
     console.log("\n");
 }
 
-battleShip(5);
+battleShip(4);
